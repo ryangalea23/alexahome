@@ -61,7 +61,7 @@ def screenshot():
     screenshot = capture_screenshot(url)
 
     # Instead of saving to a file, send directly
-    return send_file(screenshot, mimetype='image/png', as_attachment=True, attachment_filename='latest_screenshot.png')
+    return send_file(screenshot, mimetype='image/png', as_attachment=True, download_name='latest_screenshot.png')
 
 if __name__ == '__main__':
     port = int(os.environ.get('PORT', 5000))

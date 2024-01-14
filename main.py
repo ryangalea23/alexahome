@@ -1,9 +1,19 @@
 from flask import Flask, request, send_file
 from selenium import webdriver
+from selenium.webdriver.chrome.service import Service
+from selenium.webdriver.common.by import By
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
 import os
+import time
 from io import BytesIO
+from dotenv import load_dotenv
+load_dotenv('.env.development')
+
 
 app = Flask(__name__)
+def page_has_loaded(driver):
+    return driver.execute_script("return document.readyState;") == "complete"
 
 def capture_screenshot(url):
     options = webdriver.ChromeOptions()
@@ -11,14 +21,20 @@ def capture_screenshot(url):
     options.add_argument('--disable-gpu')
     options.add_argument('--no-sandbox')
     options.binary_location = os.environ.get("GOOGLE_CHROME_BIN")
-    driver = webdriver.Chrome(executable_path=os.environ.get("CHROMEDRIVER_PATH"), options=options)
+
+    service = Service(executable_path=os.environ.get("CHROMEDRIVER_PATH"))
+    driver = webdriver.Chrome(service=service, options=options)
 
     driver.get(url)
 
     # Save the screenshot to an in-memory file
-    screenshot = BytesIO()
-    screenshot.write(driver.get_screenshot_as_png())
-    screenshot.seek(0)
+    try:
+        time.sleep(10)
+        #WebDriverWait(driver, timeout=10).until(page_has_loaded)
+    finally:
+        screenshot = BytesIO()
+        screenshot.write(driver.get_screenshot_as_png())
+        screenshot.seek(0)
 
     driver.quit()
 
@@ -36,4 +52,4 @@ def screenshot():
 
 if __name__ == '__main__':
     port = int(os.environ.get('PORT', 5000))
-    app.run(host='0.0.0.0', port=port)
+    app.run(host='0.0.0.0', port=port, debug=True)

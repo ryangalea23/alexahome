@@ -24,7 +24,7 @@ def capture_screenshot(url):
 
     service = Service(executable_path=os.environ.get("CHROMEDRIVER_PATH"))
     driver = webdriver.Chrome(service=service, options=options)
-
+    driver.set_window_size(1920, 1080)  # Set the desired window size
     driver.get(url)
 
     # Save the screenshot to an in-memory file

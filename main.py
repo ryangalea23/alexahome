@@ -7,8 +7,8 @@ from selenium.webdriver.support import expected_conditions as EC
 import os
 import time
 from io import BytesIO
-from dotenv import load_dotenv
-load_dotenv('.env.development')
+#from dotenv import load_dotenv
+#load_dotenv('.env.development')
 
 
 app = Flask(__name__)
@@ -52,4 +52,4 @@ def screenshot():
 
 if __name__ == '__main__':
     port = int(os.environ.get('PORT', 5000))
-    app.run(host='0.0.0.0', port=port, debug=True)
+    app.run(host='0.0.0.0', port=port, debug=False)

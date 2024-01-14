@@ -6,6 +6,9 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 import os
 import time
+import boto3
+
+
 from io import BytesIO
 #from dotenv import load_dotenv
 #load_dotenv('.env.development')
@@ -40,7 +43,17 @@ def capture_screenshot(url):
 
     return screenshot
 
-@app.route('/screenshot', methods=['GET'])
+#@app.route('/screenshot', methods=['GET'])
+#def screenshot():
+#    url = request.args.get('url')
+#    if not url:
+#        return "No URL provided", 400
+#
+#    screenshot = capture_screenshot(url)
+#
+#    return send_file(screenshot, mimetype='image/png')
+
+@app.route('/screenshot/latest.png')
 def screenshot():
     url = request.args.get('url')
     if not url:
@@ -48,7 +61,8 @@ def screenshot():
 
     screenshot = capture_screenshot(url)
 
-    return send_file(screenshot, mimetype='image/png')
+    # Instead of saving to a file, send directly
+    return send_file(screenshot, mimetype='image/png', as_attachment=True, attachment_filename='latest_screenshot.png')
 
 if __name__ == '__main__':
     port = int(os.environ.get('PORT', 5000))

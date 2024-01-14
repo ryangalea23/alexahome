@@ -16,7 +16,6 @@ def capture_screenshot(url):
 
     # Save the screenshot to an in-memory file
     screenshot = BytesIO()
-    driver.get_screenshot_as_png()
     screenshot.write(driver.get_screenshot_as_png())
     screenshot.seek(0)
 

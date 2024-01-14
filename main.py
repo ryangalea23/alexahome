@@ -1,23 +1,39 @@
+from flask import Flask, request, send_file
 from selenium import webdriver
 import os
+from io import BytesIO
 
-def capture_screenshot(url, file_path):
-    # Set up headless Chrome browser
+app = Flask(__name__)
+
+def capture_screenshot(url):
     options = webdriver.ChromeOptions()
     options.add_argument('--headless')
     options.add_argument('--disable-gpu')
-    driver = webdriver.Chrome(executable_path='/path/to/chromedriver', options=options)
+    options.binary_location = os.environ.get("GOOGLE_CHROME_BIN")
+    driver = webdriver.Chrome(executable_path=os.environ.get("CHROMEDRIVER_PATH"), options=options)
 
-    # Open the URL
     driver.get(url)
 
-    # Capture and save the screenshot
-    driver.save_screenshot(file_path)
+    # Save the screenshot to an in-memory file
+    screenshot = BytesIO()
+    driver.get_screenshot_as_png()
+    screenshot.write(driver.get_screenshot_as_png())
+    screenshot.seek(0)
 
-    # Close the browser
     driver.quit()
 
-# Example Usage
-url = "http://goicon.com"
-file_path = "screenshot.png"
-capture_screenshot(url, file_path)
+    return screenshot
+
+@app.route('/screenshot', methods=['GET'])
+def screenshot():
+    url = request.args.get('url')
+    if not url:
+        return "No URL provided", 400
+
+    screenshot = capture_screenshot(url)
+
+    return send_file(screenshot, mimetype='image/png')
+
+if __name__ == '__main__':
+    port = int(os.environ.get('PORT', 5000))
+    app.run(host='0.0.0.0', port=port)
